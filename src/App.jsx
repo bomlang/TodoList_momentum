@@ -85,7 +85,7 @@ function App() {
     try {
       await axios
         .post("http://localhost:33088/api/todolist/", todo)
-        .then((res) => {
+        .then(() => {
           updateTodoList();
         });
     } catch (error) {
@@ -101,17 +101,19 @@ function App() {
           style={{ backgroundImage: `url(${imageData})` }}
         >
           <section className="font-semibold text-white">
+            <div className="h-[10em]"></div>
             <div className="text-white flex flex-col justify-center items-center font-bold">
               <div className="text-white text-9xl">{clock}</div>
               <span className="text-4xl">Good Working, HORI</span>
             </div>
+
             <div
-              className="text-white flex flex-col items-center mt-[5em] w-[30em] h-[6em]"
+              className="text-white flex flex-col items-center mt-[5em]"
               onMouseEnter={() => setHover(true)}
               onMouseLeave={() => setHover(false)}
             >
-              <h3 className="text-2xl">TODAY</h3>
-              <ul>
+              <h3 className="text-3xl mb-[1em]">Today Todo-List</h3>
+              <ul className=" w-[30em] h-[17em] overflow-auto">
                 {todoData ? (
                   todoData.map((item) => (
                     <Todolist
@@ -119,6 +121,7 @@ function App() {
                       hover={hover}
                       title={item.title}
                       id={item._id}
+                      updateList={updateTodoList}
                     />
                   ))
                 ) : (
