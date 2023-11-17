@@ -1,18 +1,21 @@
 import axios from "axios";
-import Todolist from "./Todolist";
+import Todolist from "./components/Todolist";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGear, faArrowUp } from "@fortawesome/free-solid-svg-icons";
+import { useRecoilState } from "recoil";
+import { clockState, imageDataState, openWeatherData } from "./atoms";
 
 function App() {
-  const [imageData, setImageData] = useState(null);
   const [openWeatherKey] = useState(import.meta.env.VITE_OPENWEATHER_KEY);
-  const [weatherData, setWeatherData] = useState(null);
-  const [clock, setClock] = useState("Clock not working");
   const [hover, setHover] = useState(false);
   const [todoData, setTodoData] = useState([]);
   const [todoUploadBtn, setTodoUploadBtn] = useState(false);
   const [todoWrite, setTodoWrite] = useState("");
+
+  const [clock, setClock] = useRecoilState(clockState);
+  const [imageData, setImageData] = useRecoilState(imageDataState);
+  const [weatherData, setWeatherData] = useRecoilState(openWeatherData);
 
   useEffect(() => {
     const city = "Seoul";
