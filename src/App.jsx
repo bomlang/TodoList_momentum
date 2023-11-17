@@ -2,7 +2,11 @@ import axios from "axios";
 import Todolist from "./components/Todolist";
 import { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faGear, faArrowUp } from "@fortawesome/free-solid-svg-icons";
+import {
+  faGear,
+  faArrowUp,
+  faMagnifyingGlass,
+} from "@fortawesome/free-solid-svg-icons";
 import { useRecoilState } from "recoil";
 import { clockState, imageDataState, openWeatherData } from "./atoms";
 
@@ -11,7 +15,12 @@ function App() {
   const [hover, setHover] = useState(false);
   const [todoData, setTodoData] = useState([]);
   const [todoUploadBtn, setTodoUploadBtn] = useState(false);
+  const [optionBtn, setOptionBtn] = useState(false);
   const [todoWrite, setTodoWrite] = useState("");
+  const [searchIcon, setSearchIcon] = useState(false);
+
+  // 완료된 아이템의 리스트
+  const [completedTodoData, setCompletedTodoData] = useState([]);
 
   const [clock, setClock] = useRecoilState(clockState);
   const [imageData, setImageData] = useRecoilState(imageDataState);
@@ -96,6 +105,19 @@ function App() {
     }
   };
 
+  const handleSearchbarClick = () => {
+    setSearchIcon((prevSearchIcon) => !prevSearchIcon);
+  };
+
+  const handleOptionBtnClick = () => {
+    setOptionBtn((prevOptionBtn) => !prevOptionBtn);
+  };
+
+  const handleCompletedList = () => {
+    const completedItems = todoData.filter((item) => item.done === true);
+    setCompletedTodoData(completedItems);
+  };
+
   return (
     <>
       {weatherData && imageData ? (
@@ -116,9 +138,9 @@ function App() {
               onMouseLeave={() => setHover(false)}
             >
               <h3 className="text-3xl mb-[1em]">Today Todo-List</h3>
-              <ul className=" w-[30em] h-[17em] overflow-auto">
-                {todoData ? (
-                  todoData.map((item) => (
+              {completedTodoData.length > 0 ? (
+                <ul className="w-[30em] h-[17em] overflow-auto mb-[3em]">
+                  {completedTodoData.map((item) => (
                     <Todolist
                       key={item._id}
                       hover={hover}
@@ -126,11 +148,21 @@ function App() {
                       id={item._id}
                       updateList={updateTodoList}
                     />
-                  ))
-                ) : (
-                  <div>Failed to load data information.😩</div>
-                )}
-              </ul>
+                  ))}
+                </ul>
+              ) : (
+                <ul className="w-[30em] h-[17em] overflow-auto mb-[3em]">
+                  {todoData.map((item) => (
+                    <Todolist
+                      key={item._id}
+                      hover={hover}
+                      title={item.title}
+                      id={item._id}
+                      updateList={updateTodoList}
+                    />
+                  ))}
+                </ul>
+              )}
             </div>
           </section>
 
@@ -155,13 +187,77 @@ function App() {
             </div>
           </section>
 
-          <section className="text-white text-2xl absolute top-[0.5em] right-[0.8em]">
-            {weatherData.data.weather[0].description}
+          <section className="text-white text-2xl absolute top-[0.5em] right-[0.8em] flex items-center">
+            <img
+              src={`http://openweathermap.org/img/w/${weatherData.data.weather[0].icon}.png`}
+              alt=""
+            />
+            <span className="pb-2">
+              {weatherData.data.weather[0].description}
+            </span>
           </section>
 
-          <section className="text-white absolute bottom-[0.5em] left-[0.8em] flex items-center text-2xl">
-            <FontAwesomeIcon icon={faGear} />
-            <div className=" ml-[0.5em]">option</div>
+          <section className="text-white absolute bottom-[0.5em] left-[0.8em] text-2xl font-bold">
+            <button
+              className=" ml-[0.5em] flex items-center gap-2"
+              onClick={handleOptionBtnClick}
+            >
+              <FontAwesomeIcon icon={faGear} />
+              <p>option</p>
+            </button>
+            <ul
+              className={`${
+                optionBtn ? "block" : "hidden"
+              } absolute bottom-[1.5em] left-[0.5em] w-[5em] h-[7em] border-2 border-white rounded-[1em] flex flex-col justify-center items-center gap-2`}
+              style={{ backdropFilter: "blur(30px)" }}
+            >
+              <li className="text-[18px] border-b-2 borer-white">
+                {/* All Todo list부분과 Completed부분 버튼이 잘 작동하지 않음. */}
+                <button onClick={updateTodoList}>All Todo list</button>
+              </li>
+              <li className="text-[18px] border-b-2 borer-white">
+                <button onClick={handleCompletedList}>Completed</button>
+              </li>
+              <li className="text-[18px] border-b-2 borer-white">
+                <button>Quick date</button>
+              </li>
+              <li className="text-[18px]">
+                <button>Late date</button>
+              </li>
+            </ul>
+          </section>
+
+          <section
+            className={`flex items-center absolute top-[0.5em] left-[0.8em] ${
+              searchIcon ? "border-b-2" : "border-none"
+            }  border-white pb-1`}
+          >
+            <div
+              className="cursor-pointer h-[3em] flex items-center"
+              onClick={handleSearchbarClick}
+            >
+              <FontAwesomeIcon
+                icon={faMagnifyingGlass}
+                className="text-white font-bold text-2xl mr-1"
+              />
+            </div>
+            {searchIcon && (
+              <form
+                className={`gap-3 flex w-[17.5em] items-center p-1 justify-between `}
+              >
+                <input
+                  type="text"
+                  className="w-[15em] bg-inherit focus:outline-none"
+                  placeholder="Search Todo List..."
+                />
+                <button
+                  type="button"
+                  className="border border-white text-white font-bold p-1 rounded-md"
+                >
+                  Search
+                </button>
+              </form>
+            )}
           </section>
         </article>
       ) : (
